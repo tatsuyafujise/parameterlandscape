@@ -25,7 +25,7 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 # メイン関数
 def main():
     random.seed(42)  # 乱数シードを設定
-    generations = 1000  # 世代数
+    generations = 10000  # 世代数
     csv_filename = "ga_results_onemax.csv"
     data = [] # データを格納するリスト
 
