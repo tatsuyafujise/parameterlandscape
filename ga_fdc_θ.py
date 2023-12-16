@@ -91,6 +91,7 @@ def main():
         #         data.append([int(row[0]), int(row[1])])
 
     # print(data)
+    np.set_printoptions(suppress=True, precision=2)  # データを表示する前に設定
     data_np = np.array(data)
     data_sorted = data_np[np.argsort(data_np[:,1])]
     print(data_sorted)
