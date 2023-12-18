@@ -29,7 +29,7 @@ def main():
     csv_filename = "ga_results_onemax.csv"
     data = [] # データを格納するリスト
 
-    for _ in range(100):  # 1000回ループ
+    for _ in range(10):  # 1000回ループ
         theta = random.uniform(0, 1)  # パラメータθをランダムに生成 # populationsize
         theta2 = random.uniform(0, 1) # cxpb
         theta3 = random.uniform(0, 1) # mutpb
@@ -67,7 +67,7 @@ def main():
                     break
 
             if optimum_found_at_generation:
-                # print(f"最適解が見つかった世代: {optimum_found_at_generation}")
+                print(f"最適解が見つかった世代: {optimum_found_at_generation}")
                 evaluations_per_theta.append(evaluations_until_optimum)
                 # csv_filename = "ga_results_onemax.csv"
                 # with open(csv_filename, 'a', newline='') as csv_file:
@@ -106,7 +106,7 @@ def main():
     # # # FDCの計算
     # dist = [abs((data_sorted[i][j][0] - data_best_θ1)*(data_sorted[i][j][1] - data_best_θ2)) for i,j in range(10)]
     # dist = [np.linalg.norm(abs((data_sorted[i][0] - data_best_θ1)-50)/150, abs(data_sorted[i][1] - data_best_θ2), ord=2) for i in range(10)]
-    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1 - 2) / 998, data_sorted[i][1] - data_best_θ2], data_sorted[i][2] - data_best_θ3, ord=2) for i in range(100)]
+    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1 - 2) / 998, data_sorted[i][1] - data_best_θ2, data_sorted[i][2] - data_best_θ3], ord=2) for i in range(10)]
     # dist = [np.sqrt((((data_sorted[i][0] - data_best_θ1)-50)/150))*(((data_sorted[i][0] - data_best_θ1)-50)/150)+((data_sorted[i][1] - data_best_θ2)*(data_sorted[i][1] - data_best_θ2)) for i in range(10)]
     print(dist)
     # # sita = [d[0] for d in data]
@@ -114,7 +114,7 @@ def main():
     # # fdc = sum(a * b for a, b in zip(sita, total_evaluations))
 
     # # print(f"FDC: {fdc}")
-    evaluations = [data_sorted[i][3] for i in range(100)]
+    evaluations = [data_sorted[i][3] for i in range(10)]
 
     # 散布図の描画
     plt.figure(figsize = (8, 6))
@@ -126,7 +126,7 @@ def main():
     plt.show()
 
     # VCの計算
-    evaluations = [evaluations for _, evaluations in data]
+    evaluations = [item[3] for item in data]
     mean_evaluations = np.mean(evaluations)
     std_evaluations = np.std(evaluations)
     vc = std_evaluations / mean_evaluations    
