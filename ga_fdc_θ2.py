@@ -125,7 +125,7 @@ def main():
     plt.show()
 
     # VCの計算
-    evaluations = [evaluations for _, evaluations in data]
+    evaluations = [evaluations for _, _, evaluations in data]
     mean_evaluations = np.mean(evaluations)
     std_evaluations = np.std(evaluations)
     vc = std_evaluations / mean_evaluations    
