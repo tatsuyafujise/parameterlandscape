@@ -26,15 +26,15 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 def main():
     random.seed(42)  # 乱数シードを設定
     generations = 10000  # 世代数
-    csv_filename = "ga_results_onemax.csv"
+    csv_filename = "ga_results_onemax_populationsize.csv"
     data = [] # データを格納するリスト
 
-    for _ in range(100):  # 1000回ループ
+    for _ in range(10):  # 1000回ループ
         theta = random.uniform(0, 1)  # パラメータθをランダムに生成
         population_size = (int)(theta * 998) + 2  # 各ループごとにランダムに生成された値
         evaluations_per_theta = []
 
-        for _ in range(10):
+        for _ in range(1):
 
             # 集団の初期化
             population = toolbox.population(n=population_size)
@@ -105,14 +105,24 @@ def main():
     # print(data_best)
 
     # # # FDCの計算
-    dist = [abs(data_sorted[i][0] - data_best) for i in range(100)]
+    dist = [abs(data_sorted[i][0] - data_best -2)/998 for i in range(10)]
     print(dist)
     # # sita = [d[0] for d in data]
     # # total_evaluations = [d[1] for d in data]
     # # fdc = sum(a * b for a, b in zip(sita, total_evaluations))
 
     # # print(f"FDC: {fdc}")
-    evaluations = [data_sorted[i][1] for i in range(100)]
+    evaluations = [data_sorted[i][1] for i in range(10)]
+
+    # VCの計算
+    mean_evaluations = np.mean(evaluations)
+    std_evaluations = np.std(evaluations)
+    vc = std_evaluations / mean_evaluations
+
+    # 相関係数の計算と表示
+    correlation = np.corrcoef(dist, evaluations)[0, 1]
+    print(f"相関係数： {correlation}")
+    print(f"VC: {vc}")
 
     # 散布図の描画
     plt.figure(figsize = (8, 6))
@@ -123,16 +133,16 @@ def main():
     plt.grid(True)
     plt.show()
 
-    # VCの計算
-    evaluations = [evaluations for _, evaluations in data]
-    mean_evaluations = np.mean(evaluations)
-    std_evaluations = np.std(evaluations)
-    vc = std_evaluations / mean_evaluations
+    # # VCの計算
+    # evaluations = [evaluations for _, evaluations in data]
+    # mean_evaluations = np.mean(evaluations)
+    # std_evaluations = np.std(evaluations)
+    # vc = std_evaluations / mean_evaluations
 
-    # 相関係数の計算と表示
-    correlation = np.corrcoef(dist, evaluations)[0, 1]
-    print(f"相関係数： {correlation}")
-    print(f"VC: {vc}")
+    # # 相関係数の計算と表示
+    # correlation = np.corrcoef(dist, evaluations)[0, 1]
+    # print(f"相関係数： {correlation}")
+    # print(f"VC: {vc}")
 
 if __name__ == "__main__":
     main()

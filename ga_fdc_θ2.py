@@ -26,7 +26,7 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 def main():
     random.seed(42)  # 乱数シードを設定
     generations = 1000  # 世代数
-    csv_filename = "ga_results_onemax.csv"
+    csv_filename = "ga_results_onemax_populationsize_cxpb.csv"
     data = [] # データを格納するリスト
 
     for _ in range(100):  # 1000回ループ
@@ -115,17 +115,7 @@ def main():
     # # print(f"FDC: {fdc}")
     evaluations = [data_sorted[i][2] for i in range(100)]
 
-    # 散布図の描画
-    plt.figure(figsize = (8, 6))
-    plt.scatter(dist, evaluations)
-    plt.xlabel('distance')
-    plt.ylabel('evaluations')
-    plt.title('fdc_population size')
-    plt.grid(True)
-    plt.show()
-
-    # VCの計算
-    evaluations = [evaluations for _, _, evaluations in data]
+     # VCの計算
     mean_evaluations = np.mean(evaluations)
     std_evaluations = np.std(evaluations)
     vc = std_evaluations / mean_evaluations    
@@ -134,6 +124,15 @@ def main():
     correlation = np.corrcoef(dist, evaluations)[0, 1]
     print(f"相関係数： {correlation}")
     print(f"VC: {vc}")
+
+    # 散布図の描画
+    plt.figure(figsize = (8, 6))
+    plt.scatter(dist, evaluations)
+    plt.xlabel('distance')
+    plt.ylabel('evaluations')
+    plt.title('fdc_population size')
+    plt.grid(True)
+    plt.show()
 
 if __name__ == "__main__":
     main()
