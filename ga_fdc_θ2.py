@@ -47,7 +47,7 @@ def main():
             # print(f"theta2: {theta2}")
             # print(f"cxpb: {cxpb}")
 
-            if cxpb>0.7:
+            if cxpb > 0.7:
                 mutpb = 1.00 - cxpb
             else:
                 mutpb = 0.3

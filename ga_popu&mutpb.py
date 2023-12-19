@@ -33,7 +33,6 @@ def main():
         theta = random.uniform(0, 1)  # パラメータθをランダムに生成
         theta2 = random.uniform(0, 1)
         population_size = (int)(theta * 998) + 2  # 各ループごとにランダムに生成された値
-        mutpb = theta2 * 3/10
         mutpb = round(theta2, 2) # 交叉率を2つ目のパラメータに設定
         evaluations_per_theta = []
 
@@ -48,13 +47,13 @@ def main():
             # print(f"theta2: {theta2}")
             # print(f"cxpb: {cxpb}")
 
-            # if mutpb>0.3:
-            #     mutpb = 1.00 - mutpb
-            # else:
-            #     mutpb = 0.3
+            if mutpb > 0.3:
+                cxpb = 1.00 - mutpb
+            else:
+                cxpb = 0.7
 
             for gen in range(generations):
-                algorithms.eaMuPlusLambda(population, toolbox, mu=population_size, lambda_=population_size, cxpb=0.7, mutpb=mutpb, ngen=1, stats=None, halloffame=None, verbose=False)
+                algorithms.eaMuPlusLambda(population, toolbox, mu=population_size, lambda_=population_size, cxpb=cxpb, mutpb=mutpb, ngen=1, stats=None, halloffame=None, verbose=False)
                 
                 # 最適解の取得
                 best_ind = tools.selBest(population, 1)[0]
@@ -68,7 +67,7 @@ def main():
                     break
 
             if optimum_found_at_generation:
-                # print(f"最適解が見つかった世代: {optimum_found_at_generation}")
+                print(f"最適解が見つかった世代: {optimum_found_at_generation}")
                 evaluations_per_theta.append(evaluations_until_optimum)
                 # csv_filename = "ga_results_onemax.csv"
                 # with open(csv_filename, 'a', newline='') as csv_file:
@@ -85,7 +84,7 @@ def main():
 
         # 各パラメータにおける評価回数の平均を計算し、データに追加
         average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
-        data.append([int(population_size), float(mutpb), int(average_evaluations)])
+        data.append([int(population_size), float(cxpb), int(average_evaluations)])
 
      # print(data)
     np.set_printoptions(suppress=True, precision=2)  # データを表示する前に設定
@@ -106,7 +105,7 @@ def main():
     # # # FDCの計算
     # dist = [abs((data_sorted[i][j][0] - data_best_θ1)*(data_sorted[i][j][1] - data_best_θ2)) for i,j in range(10)]
     # dist = [np.linalg.norm(abs((data_sorted[i][0] - data_best_θ1)-50)/150, abs(data_sorted[i][1] - data_best_θ2), ord=2) for i in range(10)]
-    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1 - 2) / 998, (data_sorted[i][1] - data_best_θ2)*10/3], ord=2) for i in range(1000)]
+    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1 - 2) / 998, data_sorted[i][1] - data_best_θ2], ord=2) for i in range(1000)]
     # dist = [np.sqrt((((data_sorted[i][0] - data_best_θ1)-50)/150))*(((data_sorted[i][0] - data_best_θ1)-50)/150)+((data_sorted[i][1] - data_best_θ2)*(data_sorted[i][1] - data_best_θ2)) for i in range(10)]
     print(dist)
     # # sita = [d[0] for d in data]
