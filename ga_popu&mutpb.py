@@ -33,7 +33,8 @@ def main():
         theta = random.uniform(0, 1)  # パラメータθをランダムに生成
         theta2 = random.uniform(0, 1)
         population_size = (int)(theta * 998) + 2  # 各ループごとにランダムに生成された値
-        mutpb = round(theta2, 2) # 交叉率を2つ目のパラメータに設定
+        mutpb = theta2 *3/10
+        mutpb = round(mutpb, 2) # 交叉率を2つ目のパラメータに設定
         evaluations_per_theta = []
 
         for _ in range(10):
@@ -105,7 +106,7 @@ def main():
     # # # FDCの計算
     # dist = [abs((data_sorted[i][j][0] - data_best_θ1)*(data_sorted[i][j][1] - data_best_θ2)) for i,j in range(10)]
     # dist = [np.linalg.norm(abs((data_sorted[i][0] - data_best_θ1)-50)/150, abs(data_sorted[i][1] - data_best_θ2), ord=2) for i in range(10)]
-    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1 - 2) / 998, data_sorted[i][1] - data_best_θ2], ord=2) for i in range(1000)]
+    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1 - 2) / 998, (data_sorted[i][1] - data_best_θ2)*10/3], ord=2) for i in range(1000)]
     # dist = [np.sqrt((((data_sorted[i][0] - data_best_θ1)-50)/150))*(((data_sorted[i][0] - data_best_θ1)-50)/150)+((data_sorted[i][1] - data_best_θ2)*(data_sorted[i][1] - data_best_θ2)) for i in range(10)]
     print(dist)
     # # sita = [d[0] for d in data]
