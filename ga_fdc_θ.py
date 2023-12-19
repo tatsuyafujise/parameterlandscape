@@ -43,7 +43,7 @@ def main():
             optimum_found_at_generation = None  # 最適解が見つかった世代を追跡するための変数
 
             for gen in range(generations):
-                algorithms.eaMuPlusLambda(population, toolbox, mu=population_size, lambda_=population_size, cxpb=0.7, mutpb=0.3, ngen=1, stats=None, halloffame=None, verbose=False)
+                algorithms.eaMuPlusLambda(population, toolbox, mu=population_size, lambda_=population_size, cxpb=0.6, mutpb=0.01, ngen=1, stats=None, halloffame=None, verbose=False)
                 
                 # 最適解の取得
                 best_ind = tools.selBest(population, 1)[0]
