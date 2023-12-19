@@ -29,12 +29,12 @@ def main():
     csv_filename = "ga_results_onemax_populationsize.csv"
     data = [] # データを格納するリスト
 
-    for _ in range(10):  # 1000回ループ
+    for _ in range(1000):  # 1000回ループ
         theta = random.uniform(0, 1)  # パラメータθをランダムに生成
         population_size = (int)(theta * 998) + 2  # 各ループごとにランダムに生成された値
         evaluations_per_theta = []
 
-        for _ in range(1):
+        for _ in range(10):
 
             # 集団の初期化
             population = toolbox.population(n=population_size)
@@ -105,14 +105,14 @@ def main():
     # print(data_best)
 
     # # # FDCの計算
-    dist = [abs(data_sorted[i][0] - data_best -2)/998 for i in range(10)]
+    dist = [abs(data_sorted[i][0] - data_best -2)/998 for i in range(1000)]
     print(dist)
     # # sita = [d[0] for d in data]
     # # total_evaluations = [d[1] for d in data]
     # # fdc = sum(a * b for a, b in zip(sita, total_evaluations))
 
     # # print(f"FDC: {fdc}")
-    evaluations = [data_sorted[i][1] for i in range(10)]
+    evaluations = [data_sorted[i][1] for i in range(1000)]
 
     # VCの計算
     mean_evaluations = np.mean(evaluations)
