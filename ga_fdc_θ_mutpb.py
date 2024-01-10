@@ -24,37 +24,31 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 
 # メイン関数
 def main():
-    random.seed(46)  # 乱数シードを設定
-    generations = 10000  # 世代数
-    csv_filename = "ga_results_onemax_populationsize&cxpb&mutpb.csv"
+    random.seed(44)  # 乱数シードを設定
+    generations = 500  # 世代数
+    csv_filename = "ga_results_onemax_mutpb.csv"
     data = [] # データを格納するリスト
-    n = 1
 
     for _ in range(1000):  # 1000回ループ
-        theta = random.uniform(0, 1)  # パラメータθをランダムに生成 # populationsize
-        theta2 = random.uniform(0, 1) # cxpb
-        theta3 = random.uniform(0, 1) # mutpb
-        population_size = (int)(theta * 998) + 2  # 各ループごとにランダムに生成された値
-        cxpb = theta2 * 0.6 + 0.3
-        cxpb = round(cxpb, 2) # 交叉率を2つ目のパラメータに設定
-        mutpb = theta3 * 0.099 + 0.001
-        mutpb = round(theta3, 5)
+        theta = random.uniform(0, 1)  # パラメータθをランダムに生成
+        # population_size = (int)(theta * 998) + 2  # 各ループごとにランダムに生成された値
+        population_size = 500 # ???←最適化された値に設定
+        mutpb = theta * 0.099 + 0.001
+        mutpb = round(theta, 5)
         evaluations_per_theta = []
+        cxpb = 0.6
 
         for _ in range(10):
+
             # 集団の初期化
             population = toolbox.population(n=population_size)
 
             # 遺伝的アルゴリズムの実行
-            optimum_found_at_generation = None  # 最適解が見つかった世代を追跡するための変数
-            # print(f"theta: {theta}")
-            # print(f"population: {population_size}")
-            # print(f"theta2: {theta2}")
-            # print(f"cxpb: {cxpb}")
-
-            if cxpb + mutpb >1.0:
-                mutpb = 1.00 - cxpb
-
+            optimum_found_at_generation = None  # 最適解が見つかった世代を追跡するための変数          
+            if mutpb > 0.3:
+                cxpb = 1.00 - mutpb
+            else:
+                cxpb = 0.6
             for gen in range(generations):
                 algorithms.eaMuPlusLambda(population, toolbox, mu=population_size, lambda_=population_size, cxpb=cxpb, mutpb=mutpb, ngen=1, stats=None, halloffame=None, verbose=False)
                 
@@ -70,61 +64,67 @@ def main():
                     break
 
             if optimum_found_at_generation:
-                print(f"{n} 最適解が見つかった世代: {optimum_found_at_generation}")
+                print(f"最適解が見つかった世代: {optimum_found_at_generation}")
                 evaluations_per_theta.append(evaluations_until_optimum)
-                n = n + 1
-                # csv_filename = "ga_results_onemax.csv"
-                # with open(csv_filename, 'a', newline='') as csv_file:
-                #     csv_writer = csv.writer(csv_file)
-                #     csv_writer.writerow([population_size, cxpb, evaluations_until_optimum])
-
             else:
-                print(f"{n} 最適解は見つかりませんでした")
+                print("最適解は見つかりませんでした")
                 evaluations_per_theta.append(population_size * generations)
-                n = n + 1
-                # csv_filename = "ga_results_onemax.csv"
-                # with open(csv_filename, 'a', newline='') as csv_file:
-                #     csv_writer = csv.writer(csv_file)
-                #     csv_writer.writerow([population_size, cxpb, population_size * generations])    
 
         # 各パラメータにおける評価回数の平均を計算し、データに追加
         average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
-        data.append([int(population_size), float(cxpb), float(mutpb), int(average_evaluations)])
+        data.append([mutpb, average_evaluations])
 
-     # print(data)
+
+        # if optimum_found_at_generation:
+        #     print(f"最適解が見つかった世代: {optimum_found_at_generation}")
+        #     csv_filename = "ga_results_onemax.csv"
+        #     with open(csv_filename, 'a', newline='') as csv_file:
+        #         csv_writer = csv.writer(csv_file)
+        #         csv_writer.writerow([population_size, evaluations_until_optimum])
+
+        # else:
+        #     print("最適解は見つかりませんでした")
+        #     csv_filename = "ga_results_onemax.csv"
+        #     with open(csv_filename, 'a', newline='') as csv_file:
+        #         csv_writer = csv.writer(csv_file)
+        #         csv_writer.writerow([population_size, population_size * generations])    
+
+
+        # # CSVファイルからデータを読み込む
+        # data = []
+        # with open(csv_filename, 'r') as csv_file:
+        #     csv_reader = csv.reader(csv_file)
+        #     for row in csv_reader:
+        #         data.append([int(row[0]), int(row[1])])
+
+    # print(data)
     np.set_printoptions(suppress=True, precision=2)  # データを表示する前に設定
     data_np = np.array(data)
-    # print(data_np)
-    data_sorted = data_np[np.argsort(data_np[:,3])]
+    data_sorted = data_np[np.argsort(data_np[:,1])]
     print(data_sorted)
 
     with open(csv_filename, 'w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
-        csv_writer.writerows(data)
+        csv_writer.writerows(data_sorted)
 
     # 最適解
-    data_best_θ1 = np.array(data_sorted[0][0])
-    data_best_θ2 = np.array(data_sorted[0][1])
-    data_best_θ3 = np.array(data_sorted[0][2])
+    data_best = np.array(data_sorted[0][0])
     # print(data_best)
 
     # # # FDCの計算
-    # dist = [abs((data_sorted[i][j][0] - data_best_θ1)*(data_sorted[i][j][1] - data_best_θ2)) for i,j in range(10)]
-    # dist = [np.linalg.norm(abs((data_sorted[i][0] - data_best_θ1)-50)/150, abs(data_sorted[i][1] - data_best_θ2), ord=2) for i in range(10)]
-    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1 - 2) / 998, (data_sorted[i][1] - data_best_θ2 - 0.3) / 0.6, (data_sorted[i][2] - data_best_θ3 - 0.001) / 0.099], ord=2) for i in range(1000)]
-    # dist = [np.sqrt((((data_sorted[i][0] - data_best_θ1)-50)/150))*(((data_sorted[i][0] - data_best_θ1)-50)/150)+((data_sorted[i][1] - data_best_θ2)*(data_sorted[i][1] - data_best_θ2)) for i in range(10)]
+    dist = [abs(data_sorted[i][0] - data_best -0.001)/0.099 for i in range(1000)]
     print(dist)
     # # sita = [d[0] for d in data]
     # # total_evaluations = [d[1] for d in data]
     # # fdc = sum(a * b for a, b in zip(sita, total_evaluations))
 
     # # print(f"FDC: {fdc}")
-    evaluations = [data_sorted[i][3] for i in range(1000)]
+    evaluations = [data_sorted[i][1] for i in range(1000)]
 
     # VCの計算
     mean_evaluations = np.mean(evaluations)
     std_evaluations = np.std(evaluations)
-    vc = std_evaluations / mean_evaluations    
+    vc = std_evaluations / mean_evaluations
 
     # 相関係数の計算と表示
     correlation = np.corrcoef(dist, evaluations)[0, 1]
@@ -136,9 +136,21 @@ def main():
     plt.scatter(dist, evaluations)
     plt.xlabel('distance')
     plt.ylabel('evaluations')
-    plt.title('fdc_population size')
+    plt.title('fdc_mutpb')
     plt.grid(True)
     plt.show()
 
+    # # VCの計算
+    # evaluations = [evaluations for _, evaluations in data]
+    # mean_evaluations = np.mean(evaluations)
+    # std_evaluations = np.std(evaluations)
+    # vc = std_evaluations / mean_evaluations
+
+    # # 相関係数の計算と表示
+    # correlation = np.corrcoef(dist, evaluations)[0, 1]
+    # print(f"相関係数： {correlation}")
+    # print(f"VC: {vc}")
+
 if __name__ == "__main__":
     main()
+
