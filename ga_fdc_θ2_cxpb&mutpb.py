@@ -13,7 +13,7 @@ creator.create("Individual", list, fitness=creator.FitnessMax)
 
 toolbox = base.Toolbox()
 toolbox.register("attr_bool", random.randint, 0, 1)  # バイナリ遺伝子の生成
-toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_bool, 100)  # 遺伝子の長さは100と仮定
+toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_bool, 50)  # 遺伝子の長さは100と仮定
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("evaluate", evaluate)
 toolbox.register("mate", tools.cxUniform, indpb=0.5)
@@ -23,13 +23,13 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 
 # メイン関数
 def main():
-    random.seed(42)  # 乱数シードを設定
+    random.seed(60)  # 乱数シードを設定
     generations = 10000  # 世代数
     population_size = 500
-    csv_filename = "ga_results_onemax_cxpb&mutpb.csv"
+    csv_filename = "ga_results_onemax_cxpb*mutpb.csv"
     data = [] # データを格納するリスト
     heatdict = {}
-    for key in range(100):
+    for key in range(60):
       heatdict[key] = []
     n = 1
 
@@ -53,10 +53,10 @@ def main():
             # print(f"theta2: {theta2}")
             # print(f"cxpb: {cxpb}")
 
-            if mutpb > 0.3:
+            if mutpb + cxpb > 1.0:
                 cxpb = 1.00 - mutpb
-            else:
-                cxpb = 0.6
+            # else:
+            #     cxpb = 0.6
 
             for gen in range(generations):
                 algorithms.eaMuPlusLambda(population, toolbox, mu=population_size, lambda_=population_size, cxpb=cxpb, mutpb=mutpb, ngen=1, stats=None, halloffame=None, verbose=False)
@@ -67,22 +67,25 @@ def main():
                 evaluations = best_ind.fitness.values
 
                 # 最適解が見つかった場合、評価回数を記録してループを終了
-                if any(evaluations[0] == 100.0 for ind in population):
+                if any(evaluations[0] == 50.0 for ind in population):
                     optimum_found_at_generation = gen + 1
                     evaluations_until_optimum = population_size * (optimum_found_at_generation + 1)
                     break
 
             if optimum_found_at_generation:
-                print(f"最適解が見つかった世代: {optimum_found_at_generation}")
+                if(n%100==0):
+                    print(f"{n}最適解が見つかった世代: {optimum_found_at_generation}")
                 evaluations_per_theta.append(evaluations_until_optimum)
+                n = n + 1
                 # csv_filename = "ga_results_onemax.csv"
                 # with open(csv_filename, 'a', newline='') as csv_file:
                 #     csv_writer = csv.writer(csv_file)
                 #     csv_writer.writerow([population_size, cxpb, evaluations_until_optimum])
 
             else:
-                print("最適解は見つかりませんでした")
+                print(f"{n}最適解は見つかりませんでした")
                 evaluations_per_theta.append(population_size * generations)
+                n = n + 1
                 # csv_filename = "ga_results_onemax.csv"
                 # with open(csv_filename, 'a', newline='') as csv_file:
                 #     csv_writer = csv.writer(csv_file)
@@ -99,12 +102,12 @@ def main():
     # print(data_np)
     data_sorted = data_np[np.argsort(data_np[:,2])]
     print(data_sorted)
-    for i in range(100):
+    for i in range(60):
           heatdict[i] = np.mean(heatdict[i])
           # print(f"{i}: {heatdict[i]}")
     zz = np.array(list(heatdict.values()))
     # zz = np.nan_to_num(zz, nan = 300000)
-    zz = zz.reshape(10, 10) 
+    zz = zz.reshape(6, 10) 
     # zz = np.array2string(zz, separator=', ', formatter={'float_kind': lambda x: '{: .1f}'.format(x)})
     # zz = np.fromstring(zz, sep=', ')
     print(zz)
@@ -120,7 +123,7 @@ def main():
     # # # FDCの計算
     # dist = [abs((data_sorted[i][j][0] - data_best_θ1)*(data_sorted[i][j][1] - data_best_θ2)) for i,j in range(10)]
     # dist = [np.linalg.norm(abs((data_sorted[i][0] - data_best_θ1)-50)/150, abs(data_sorted[i][1] - data_best_θ2), ord=2) for i in range(10)]
-    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1 - 0.3) * 10 / 6, (data_sorted[i][1] - data_best_θ2 - 0.001) / 0.099], ord=2) for i in range(1000)]
+    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1) * 10 / 6, (data_sorted[i][1] - data_best_θ2) / 0.099], ord=2) for i in range(1000)]
     # dist = [np.sqrt((((data_sorted[i][0] - data_best_θ1)-50)/150))*(((data_sorted[i][0] - data_best_θ1)-50)/150)+((data_sorted[i][1] - data_best_θ2)*(data_sorted[i][1] - data_best_θ2)) for i in range(10)]
     print(dist)
     # # sita = [d[0] for d in data]
@@ -145,21 +148,21 @@ def main():
     ax1.scatter(dist, evaluations)
     ax1.set_xlabel('distance')
     ax1.set_ylabel('evaluations')
-    ax1.set_title('fdc_population size vs cxpb')
+    ax1.set_title('fdc_cxpb vs mutpb')
     ax1.grid(True)
 
     ax2 = Fig.add_subplot(2,1,2)    # ヒートマップ
     X = np.arange(0, 10)
-    Y = np.arange(0, 10)
-    mappable = ax2.pcolor(X, Y, zz, edgecolors='k', linewidths=2, cmap='nipy_spectral_r')  # edgecolors, linewidths, cmap を追加
+    Y = np.arange(3, 10)
+    mappable = ax2.pcolor(zz, edgecolors='k', linewidths=2, cmap='nipy_spectral_r')  # edgecolors, linewidths, cmap を追加
     plt.colorbar(mappable, ax=ax2)    # x = heatdict.keys % 10
     # x = heatdict.keys % 10
     # y = heatdict.keys / 10
     # ax2.pcolor(X,Y,zz)
 
     # ラベルやタイトルの設定
-    ax2.set_xlabel('Crossover Probability')
-    ax2.set_ylabel('Mutation Probability')
+    ax2.set_xlabel('Mutation Probability')
+    ax2.set_ylabel('Crossover Probability')
     ax2.set_title('Heatmap')
 
     # グリッドの表示
