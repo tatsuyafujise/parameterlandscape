@@ -3,7 +3,6 @@ import csv
 from deap import base, creator, tools, algorithms
 import numpy as np
 import matplotlib.pyplot as plt
-
 # 遺伝的アルゴリズムの評価関数
 def evaluate(individual):
     return sum(individual),
@@ -26,13 +25,19 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 def main():
     random.seed(42)  # 乱数シードを設定
     generations = 10000  # 世代数
+    population_size = 500
     csv_filename = "ga_results_onemax_cxpb&mutpb.csv"
     data = [] # データを格納するリスト
+    heatdict = {}
+    for key in range(100):
+      heatdict[key] = []
+    n = 1
 
     for _ in range(1000):  # 1000回ループ
         theta = random.uniform(0, 1)  # パラメータθをランダムに生成
         theta2 = random.uniform(0, 1)
-        population_size = (int)(theta * 998) + 2  # 各ループごとにランダムに生成された値
+        cxpb = theta * 6 / 10 + 0.3
+        cxpb = round(cxpb, 2)
         mutpb = theta2 * 0.099 +0.001
         mutpb = round(mutpb, 5) # 交叉率を2つ目のパラメータに設定
         evaluations_per_theta = []
@@ -84,8 +89,9 @@ def main():
                 #     csv_writer.writerow([population_size, cxpb, population_size * generations])    
 
         # 各パラメータにおける評価回数の平均を計算し、データに追加
-        average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
-        data.append([int(population_size), float(cxpb), int(average_evaluations)])
+        average_evaluations = np.median(evaluations_per_theta)
+        heatdict.setdefault((10*(int)(10*(cxpb-0.31))+(int)(100*(mutpb-0.0011))), []).append(average_evaluations)
+        data.append([float(cxpb), float(mutpb), int(average_evaluations)])
 
      # print(data)
     np.set_printoptions(suppress=True, precision=2)  # データを表示する前に設定
@@ -93,7 +99,15 @@ def main():
     # print(data_np)
     data_sorted = data_np[np.argsort(data_np[:,2])]
     print(data_sorted)
-
+    for i in range(100):
+          heatdict[i] = np.mean(heatdict[i])
+          # print(f"{i}: {heatdict[i]}")
+    zz = np.array(list(heatdict.values()))
+    # zz = np.nan_to_num(zz, nan = 300000)
+    zz = zz.reshape(10, 10) 
+    # zz = np.array2string(zz, separator=', ', formatter={'float_kind': lambda x: '{: .1f}'.format(x)})
+    # zz = np.fromstring(zz, sep=', ')
+    print(zz)
     with open(csv_filename, 'w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
         csv_writer.writerows(data)
@@ -106,7 +120,7 @@ def main():
     # # # FDCの計算
     # dist = [abs((data_sorted[i][j][0] - data_best_θ1)*(data_sorted[i][j][1] - data_best_θ2)) for i,j in range(10)]
     # dist = [np.linalg.norm(abs((data_sorted[i][0] - data_best_θ1)-50)/150, abs(data_sorted[i][1] - data_best_θ2), ord=2) for i in range(10)]
-    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1 - 2) / 998, (data_sorted[i][1] - data_best_θ2 - 0.001) / 0.099], ord=2) for i in range(1000)]
+    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1 - 0.3) * 10 / 6, (data_sorted[i][1] - data_best_θ2 - 0.001) / 0.099], ord=2) for i in range(1000)]
     # dist = [np.sqrt((((data_sorted[i][0] - data_best_θ1)-50)/150))*(((data_sorted[i][0] - data_best_θ1)-50)/150)+((data_sorted[i][1] - data_best_θ2)*(data_sorted[i][1] - data_best_θ2)) for i in range(10)]
     print(dist)
     # # sita = [d[0] for d in data]
@@ -126,15 +140,35 @@ def main():
     print(f"相関係数： {correlation}")
     print(f"VC: {vc}")
 
-    # 散布図の描画
-    plt.figure(figsize = (8, 6))
-    plt.scatter(dist, evaluations)
-    plt.xlabel('distance')
-    plt.ylabel('evaluations')
-    plt.title('fdc_population size')
-    plt.grid(True)
+    Fig = plt.figure()
+    ax1 = Fig.add_subplot(2,1,1)   # 散布図
+    ax1.scatter(dist, evaluations)
+    ax1.set_xlabel('distance')
+    ax1.set_ylabel('evaluations')
+    ax1.set_title('fdc_population size vs cxpb')
+    ax1.grid(True)
+
+    ax2 = Fig.add_subplot(2,1,2)    # ヒートマップ
+    X = np.arange(0, 10)
+    Y = np.arange(0, 10)
+    mappable = ax2.pcolor(X, Y, zz, edgecolors='k', linewidths=2, cmap='nipy_spectral_r')  # edgecolors, linewidths, cmap を追加
+    plt.colorbar(mappable, ax=ax2)    # x = heatdict.keys % 10
+    # x = heatdict.keys % 10
+    # y = heatdict.keys / 10
+    # ax2.pcolor(X,Y,zz)
+
+    # ラベルやタイトルの設定
+    ax2.set_xlabel('Crossover Probability')
+    ax2.set_ylabel('Mutation Probability')
+    ax2.set_title('Heatmap')
+
+    # グリッドの表示
+    # plt.grid(True)
+    Fig.tight_layout()
+    # 表示
     plt.show()
 
 if __name__ == "__main__":
     main()
 
+    

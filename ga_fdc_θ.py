@@ -25,16 +25,17 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 # メイン関数
 def main():
     random.seed(42)  # 乱数シードを設定
-    generations = 500  # 世代数
+    generations = 10000  # 世代数
     csv_filename = "ga_results_onemax_populationsize.csv"
     data = [] # データを格納するリスト
+    n = 1
 
     for _ in range(1000):  # 1000回ループ
         theta = random.uniform(0, 1)  # パラメータθをランダムに生成
         population_size = (int)(theta * 998) + 2  # 各ループごとにランダムに生成された値
         evaluations_per_theta = []
 
-        for _ in range(30):
+        for _ in range(10):
 
             # 集団の初期化
             population = toolbox.population(n=population_size)
@@ -57,14 +58,17 @@ def main():
                     break
 
             if optimum_found_at_generation:
-                # print(f"最適解が見つかった世代: {optimum_found_at_generation}")
+                print(f"{n}最適解が見つかった世代: {optimum_found_at_generation}")
+                n = n + 1
                 evaluations_per_theta.append(evaluations_until_optimum)
             else:
-                print("最適解は見つかりませんでした")
+                print(f"{n}最適解は見つかりませんでした")
                 evaluations_per_theta.append(population_size * generations)
+                n = n + 1
 
         # 各パラメータにおける評価回数の平均を計算し、データに追加
-        average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
+        # average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
+        average_evaluations = np.median(evaluations_per_theta)
         data.append([population_size, average_evaluations])
 
 
