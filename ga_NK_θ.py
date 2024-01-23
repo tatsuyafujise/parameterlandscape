@@ -7,7 +7,7 @@ from deap import base, creator, tools, algorithms
 
 
 # NKランドスケープの要素数とKを設定
-N = 15  # 要素数
+N = 12  # 要素数
 K = 2   # 各要素の相互作用数
 
 random.seed(30) # NK参照表のスコアのための乱数
@@ -60,7 +60,7 @@ toolbox.register("mutate", tools.mutFlipBit, indpb=0.05)  # ビット反転突�
 toolbox.register("select", tools.selTournament, tournsize=3)
 
 def main():
-    random.seed(42)
+    random.seed(50)
     generations = 1000 # 世代数
     csv_filename = "ga_results_NK_populationsize.csv"
     data = []
@@ -122,7 +122,7 @@ def main():
     data_best = np.array(data_sorted[0][0])
 
     # FDCの計算
-    dist = [abs(data_sorted[i][0] - data_best - 2) / 998 for i in range(1000)]
+    dist = [abs(data_sorted[i][0] - data_best) / 998 for i in range(1000)]
     print(dist)
     evaluations = [data_sorted[i][1] for i in range(1000)]
 
