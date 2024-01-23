@@ -29,7 +29,7 @@ def main():
     csv_filename = "ga_results_onemax_cxpb.csv"
     data = [] # データを格納するリスト
 
-    for _ in range(1000):  # 1000回ループ
+    for _ in range(10):  # 1000回ループ
         theta = random.uniform(0, 1)  # パラメータθをランダムに生成
         # population_size = (int)(theta * 998) + 2  # 各ループごとにランダムに生成された値
         population_size = 500 #???←最適化された値に設定
@@ -37,7 +37,7 @@ def main():
         cxpb = round(cxpb, 2)
         evaluations_per_theta = []
 
-        for _ in range(30):
+        for _ in range(10):
 
             # 集団の初期化
             population = toolbox.population(n=population_size)
@@ -51,7 +51,7 @@ def main():
 
             for gen in range(generations):
                 algorithms.eaMuPlusLambda(population, toolbox, mu=population_size, lambda_=population_size, cxpb=cxpb, mutpb=0.01, ngen=1, stats=None, halloffame=None, verbose=False)
-                
+
                 # 最適解の取得
                 best_ind = tools.selBest(population, 1)[0]
                 # c(θ)の評価回数?を取得
@@ -71,7 +71,8 @@ def main():
                 evaluations_per_theta.append(population_size * generations)
 
         # 各パラメータにおける評価回数の平均を計算し、データに追加
-        average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
+        # average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
+        average_evaluations = np.median(evaluations_per_theta)
         data.append([cxpb, average_evaluations])
 
 
@@ -112,14 +113,14 @@ def main():
     # print(data_best)
 
     # # # FDCの計算
-    dist = [abs(data_sorted[i][0] - data_best -0.3)*10/6 for i in range(1000)]
+    dist = [(abs(data_sorted[i][0] - data_best))*10/6 for i in range(10)]
     print(dist)
     # # sita = [d[0] for d in data]
     # # total_evaluations = [d[1] for d in data]
     # # fdc = sum(a * b for a, b in zip(sita, total_evaluations))
 
     # # print(f"FDC: {fdc}")
-    evaluations = [data_sorted[i][1] for i in range(1000)]
+    evaluations = [data_sorted[i][1] for i in range(10)]
 
     # VCの計算
     mean_evaluations = np.mean(evaluations)
@@ -153,4 +154,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
