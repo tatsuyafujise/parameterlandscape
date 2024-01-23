@@ -14,7 +14,7 @@ creator.create("Individual", list, fitness=creator.FitnessMax)
 
 toolbox = base.Toolbox()
 toolbox.register("attr_bool", random.randint, 0, 1)  # バイナリ遺伝子の生成
-toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_bool, 100)  # 遺伝子の長さは100と仮定
+toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_bool, 50)  # 遺伝子の長さは100と仮定
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("evaluate", evaluate)
 toolbox.register("mate", tools.cxUniform, indpb=0.5)
@@ -26,7 +26,7 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 def main():
     random.seed(46)  # 乱数シードを設定
     generations = 10000  # 世代数
-    csv_filename = "ga_results_onemax_populationsize&cxpb&mutpb.csv"
+    csv_filename = "ga_results_onemax_populationsize*cxpb*mutpb.csv"
     data = [] # データを格納するリスト
     n = 1
 
@@ -64,13 +64,14 @@ def main():
                 evaluations = best_ind.fitness.values
 
                 # 最適解が見つかった場合、評価回数を記録してループを終了
-                if any(evaluations[0] == 100.0 for ind in population):
+                if any(evaluations[0] == 50.0 for ind in population):
                     optimum_found_at_generation = gen + 1
                     evaluations_until_optimum = population_size * (optimum_found_at_generation + 1)
                     break
 
             if optimum_found_at_generation:
-                print(f"{n} 最適解が見つかった世代: {optimum_found_at_generation}")
+                if(n%100==0):
+                    print(f"{n} 最適解が見つかった世代: {optimum_found_at_generation}")
                 evaluations_per_theta.append(evaluations_until_optimum)
                 n = n + 1
                 # csv_filename = "ga_results_onemax.csv"
@@ -88,7 +89,8 @@ def main():
                 #     csv_writer.writerow([population_size, cxpb, population_size * generations])    
 
         # 各パラメータにおける評価回数の平均を計算し、データに追加
-        average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
+        # average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
+        average_evaluations = np.median(evaluations_per_theta)
         data.append([int(population_size), float(cxpb), float(mutpb), int(average_evaluations)])
 
      # print(data)
@@ -100,7 +102,7 @@ def main():
 
     with open(csv_filename, 'w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
-        csv_writer.writerows(data)
+        csv_writer.writerows(data_sorted)
 
     # 最適解
     data_best_θ1 = np.array(data_sorted[0][0])
@@ -111,7 +113,7 @@ def main():
     # # # FDCの計算
     # dist = [abs((data_sorted[i][j][0] - data_best_θ1)*(data_sorted[i][j][1] - data_best_θ2)) for i,j in range(10)]
     # dist = [np.linalg.norm(abs((data_sorted[i][0] - data_best_θ1)-50)/150, abs(data_sorted[i][1] - data_best_θ2), ord=2) for i in range(10)]
-    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1 - 2) / 998, (data_sorted[i][1] - data_best_θ2 - 0.3) / 0.6, (data_sorted[i][2] - data_best_θ3 - 0.001) / 0.099], ord=2) for i in range(1000)]
+    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1) / 998, (data_sorted[i][1] - data_best_θ2) / 0.6, (data_sorted[i][2] - data_best_θ3) / 0.099], ord=2) for i in range(1000)]
     # dist = [np.sqrt((((data_sorted[i][0] - data_best_θ1)-50)/150))*(((data_sorted[i][0] - data_best_θ1)-50)/150)+((data_sorted[i][1] - data_best_θ2)*(data_sorted[i][1] - data_best_θ2)) for i in range(10)]
     print(dist)
     # # sita = [d[0] for d in data]
@@ -136,7 +138,7 @@ def main():
     plt.scatter(dist, evaluations)
     plt.xlabel('distance')
     plt.ylabel('evaluations')
-    plt.title('fdc_population size')
+    plt.title('fdc_population size vs cxpb vs mutpb')
     plt.grid(True)
     plt.show()
 
