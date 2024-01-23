@@ -14,7 +14,7 @@ creator.create("Individual", list, fitness=creator.FitnessMax)
 
 toolbox = base.Toolbox()
 toolbox.register("attr_bool", random.randint, 0, 1)  # バイナリ遺伝子の生成
-toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_bool, 100)  # 遺伝子の長さは100と仮定
+toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_bool, 50)  # 遺伝子の長さは100と仮定
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("evaluate", evaluate)
 toolbox.register("mate", tools.cxUniform, indpb=0.5)
@@ -52,13 +52,14 @@ def main():
                 evaluations = best_ind.fitness.values
 
                 # 最適解が見つかった場合、評価回数を記録してループを終了
-                if any(evaluations[0] == 100.0 for ind in population):
+                if any(evaluations[0] == 50.0 for ind in population):
                     optimum_found_at_generation = gen + 1
                     evaluations_until_optimum = population_size * (optimum_found_at_generation + 1)
                     break
 
             if optimum_found_at_generation:
-                print(f"{n}最適解が見つかった世代: {optimum_found_at_generation}")
+                if(n%100==0):
+                    print(f"{n}最適解が見つかった世代: {optimum_found_at_generation}")
                 n = n + 1
                 evaluations_per_theta.append(evaluations_until_optimum)
             else:
@@ -71,29 +72,6 @@ def main():
         average_evaluations = np.median(evaluations_per_theta)
         data.append([population_size, average_evaluations])
 
-
-        # if optimum_found_at_generation:
-        #     print(f"最適解が見つかった世代: {optimum_found_at_generation}")
-        #     csv_filename = "ga_results_onemax.csv"
-        #     with open(csv_filename, 'a', newline='') as csv_file:
-        #         csv_writer = csv.writer(csv_file)
-        #         csv_writer.writerow([population_size, evaluations_until_optimum])
-
-        # else:
-        #     print("最適解は見つかりませんでした")
-        #     csv_filename = "ga_results_onemax.csv"
-        #     with open(csv_filename, 'a', newline='') as csv_file:
-        #         csv_writer = csv.writer(csv_file)
-        #         csv_writer.writerow([population_size, population_size * generations])    
-
-
-        # # CSVファイルからデータを読み込む
-        # data = []
-        # with open(csv_filename, 'r') as csv_file:
-        #     csv_reader = csv.reader(csv_file)
-        #     for row in csv_reader:
-        #         data.append([int(row[0]), int(row[1])])
-
     # print(data)
     np.set_printoptions(suppress=True, precision=2)  # データを表示する前に設定
     data_np = np.array(data)
@@ -102,14 +80,14 @@ def main():
 
     with open(csv_filename, 'w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
-        csv_writer.writerows(data_np)
+        csv_writer.writerows(data_sorted)
 
     # 最適解
     data_best = np.array(data_sorted[0][0])
     # print(data_best)
 
     # # # FDCの計算
-    dist = [abs(data_sorted[i][0] - data_best -2)/998 for i in range(1000)]
+    dist = [abs(data_sorted[i][0] - data_best)/998 for i in range(1000)]
     print(dist)
     # # sita = [d[0] for d in data]
     # # total_evaluations = [d[1] for d in data]
@@ -136,17 +114,6 @@ def main():
     plt.title('fdc_population size')
     plt.grid(True)
     plt.show()
-
-    # # VCの計算
-    # evaluations = [evaluations for _, evaluations in data]
-    # mean_evaluations = np.mean(evaluations)
-    # std_evaluations = np.std(evaluations)
-    # vc = std_evaluations / mean_evaluations
-
-    # # 相関係数の計算と表示
-    # correlation = np.corrcoef(dist, evaluations)[0, 1]
-    # print(f"相関係数： {correlation}")
-    # print(f"VC: {vc}")
 
 if __name__ == "__main__":
     main()

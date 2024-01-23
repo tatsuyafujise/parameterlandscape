@@ -66,11 +66,11 @@ def main():
 
             if optimum_found_at_generation:
                 if(n%100 == 0):
-                    print(f"最適解が見つかった世代: {optimum_found_at_generation}")
+                    print(f"{n}最適解が見つかった世代: {optimum_found_at_generation}")
                 evaluations_per_theta.append(evaluations_until_optimum)
                 n = n + 1
             else:
-                print("最適解は見つかりませんでした")
+                print(f"{n}最適解は見つかりませんでした")
                 evaluations_per_theta.append(population_size * generations)
                 n = n + 1
 
