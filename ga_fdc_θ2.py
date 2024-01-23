@@ -138,7 +138,7 @@ def main():
     ax2 = Fig.add_subplot(2,1,2)    # ヒートマップ
     X = np.arange(0, 1000)
     Y = np.arange(3, 10)/10
-    mappable = ax2.pcolor(X, Y, zz, edgecolors='k', linewidths=2, cmap='nipy_spectral_r')  # edgecolors, linewidths, cmap を追加
+    mappable = ax2.pcolor(zz, edgecolors='k', linewidths=2, cmap='nipy_spectral_r')  # edgecolors, linewidths, cmap を追加
     plt.colorbar(mappable, ax=ax2)    # x = heatdict.keys % 10
     # x = heatdict.keys % 10
     # y = heatdict.keys / 10
