@@ -14,7 +14,7 @@ creator.create("Individual", list, fitness=creator.FitnessMax)
 
 toolbox = base.Toolbox()
 toolbox.register("attr_bool", random.randint, 0, 1)  # バイナリ遺伝子の生成
-toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_bool, 100)  # 遺伝子の長さは100と仮定
+toolbox.register("individual", tools.initRepeat, creator.Individual, toolbox.attr_bool, 50)  # 遺伝子の長さは100と仮定
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("evaluate", evaluate)
 toolbox.register("mate", tools.cxUniform, indpb=0.5)
@@ -25,9 +25,10 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 # メイン関数
 def main():
     random.seed(44)  # 乱数シードを設定
-    generations = 500  # 世代数
+    generations = 10000  # 世代数
     csv_filename = "ga_results_onemax_mutpb.csv"
     data = [] # データを格納するリスト
+    n = 1
 
     for _ in range(1000):  # 1000回ループ
         theta = random.uniform(0, 1)  # パラメータθをランダムに生成
@@ -58,44 +59,25 @@ def main():
                 evaluations = best_ind.fitness.values
 
                 # 最適解が見つかった場合、評価回数を記録してループを終了
-                if any(evaluations[0] == 100.0 for ind in population):
+                if any(evaluations[0] == 50.0 for ind in population):
                     optimum_found_at_generation = gen + 1
                     evaluations_until_optimum = population_size * (optimum_found_at_generation + 1)
                     break
 
             if optimum_found_at_generation:
-                print(f"最適解が見つかった世代: {optimum_found_at_generation}")
+                if(n%100==0):
+                    print(f"最適解が見つかった世代: {optimum_found_at_generation}")
                 evaluations_per_theta.append(evaluations_until_optimum)
+                n = n + 1
             else:
                 print("最適解は見つかりませんでした")
                 evaluations_per_theta.append(population_size * generations)
+                n = n + 1
 
         # 各パラメータにおける評価回数の平均を計算し、データに追加
-        average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
+        # average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
+        average_evaluations = np.median(evaluations_per_theta)
         data.append([mutpb, average_evaluations])
-
-
-        # if optimum_found_at_generation:
-        #     print(f"最適解が見つかった世代: {optimum_found_at_generation}")
-        #     csv_filename = "ga_results_onemax.csv"
-        #     with open(csv_filename, 'a', newline='') as csv_file:
-        #         csv_writer = csv.writer(csv_file)
-        #         csv_writer.writerow([population_size, evaluations_until_optimum])
-
-        # else:
-        #     print("最適解は見つかりませんでした")
-        #     csv_filename = "ga_results_onemax.csv"
-        #     with open(csv_filename, 'a', newline='') as csv_file:
-        #         csv_writer = csv.writer(csv_file)
-        #         csv_writer.writerow([population_size, population_size * generations])    
-
-
-        # # CSVファイルからデータを読み込む
-        # data = []
-        # with open(csv_filename, 'r') as csv_file:
-        #     csv_reader = csv.reader(csv_file)
-        #     for row in csv_reader:
-        #         data.append([int(row[0]), int(row[1])])
 
     # print(data)
     np.set_printoptions(suppress=True, precision=2)  # データを表示する前に設定
@@ -112,7 +94,7 @@ def main():
     # print(data_best)
 
     # # # FDCの計算
-    dist = [abs(data_sorted[i][0] - data_best -0.001)/0.099 for i in range(1000)]
+    dist = [abs(data_sorted[i][0] - data_best)/0.099 for i in range(1000)]
     print(dist)
     # # sita = [d[0] for d in data]
     # # total_evaluations = [d[1] for d in data]
