@@ -111,8 +111,8 @@ def main():
                 evaluations_per_theta.append(population_size * generations)
                 n = n + 1
 
-        # average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
-        average_evaluations = np.median(evaluations_per_theta)
+        average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
+        # average_evaluations = np.median(evaluations_per_theta)
         data.append([mutpb, average_evaluations])
 
     np.set_printoptions(suppress = True, precision = 2)

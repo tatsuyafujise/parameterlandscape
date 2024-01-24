@@ -75,8 +75,8 @@ def main():
                 n = n + 1
 
         # 各パラメータにおける評価回数の平均を計算し、データに追加
-        # average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
-        average_evaluations = np.median(evaluations_per_theta)
+        average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
+        # average_evaluations = np.median(evaluations_per_theta)
         data.append([mutpb, average_evaluations])
 
     # print(data)

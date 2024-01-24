@@ -92,7 +92,7 @@ def main():
                 #     csv_writer.writerow([population_size, cxpb, population_size * generations])    
 
         # 各パラメータにおける評価回数の平均を計算し、データに追加
-        average_evaluations = np.median(evaluations_per_theta)
+        average_evaluations = np.mean(evaluations_per_theta)
         heatdict.setdefault((10*(int)(10*(cxpb-0.31))+(int)(100*(mutpb-0.0011))), []).append(average_evaluations)
         data.append([float(cxpb), float(mutpb), int(average_evaluations)])
 
