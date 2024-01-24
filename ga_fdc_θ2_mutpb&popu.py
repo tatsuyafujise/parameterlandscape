@@ -113,7 +113,7 @@ def main():
     print(zz)
     with open(csv_filename, 'w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
-        csv_writer.writerows(data)
+        csv_writer.writerows(data_sorted)
 
     # 最適解
     data_best_θ1 = np.array(data_sorted[0][0])

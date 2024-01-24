@@ -69,7 +69,7 @@ def main():
         heatdict[key] = []
     n = 1
 
-    for _ in range(100):
+    for _ in range(1000):
         theta = random.uniform(0, 1)
         theta2 = random.uniform(0, 1)
         population_size = (int)(theta * 998) + 2
@@ -140,9 +140,9 @@ def main():
     data_best_θ2 = np.array(data_sorted[0][1])
 
     # FDCの計算
-    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1 - 2) / 998, (data_sorted[i][1] - data_best_θ2 - 0.3) * 10 / 6], ord=2) for i in range(100)]
+    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1) / 998, (data_sorted[i][1] - data_best_θ2) * 10 / 6], ord=2) for i in range(1000)]
     print(dist)
-    evaluations = [data_sorted[i][2] for i in range(100)]
+    evaluations = [data_sorted[i][2] for i in range(1000)]
 
     # VCの計算
     mean_evaluations = np.mean(evaluations)
@@ -163,9 +163,9 @@ def main():
     ax1.grid(True)
 
     ax2 = Fig.add_subplot(2,1,2)    # ヒートマップ
-    X = np.arange(0, 10)
-    Y = np.arange(0, 6)
-    mappable = ax2.pcolor(X, Y, zz, edgecolors='k', linewidths=2, cmap='nipy_spectral_r')  # edgecolors, linewidths, cmap を追加
+    X = np.arange(0, 1000)
+    Y = np.arange(3, 10)/10
+    mappable = ax2.pcolor(zz, edgecolors='k', linewidths=2, cmap='nipy_spectral_r')  # edgecolors, linewidths, cmap を追加
     plt.colorbar(mappable, ax=ax2)
     # x = heatdict.keys % 10
     # y = heatdict.keys / 10
