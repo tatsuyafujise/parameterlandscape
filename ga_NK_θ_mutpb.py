@@ -70,7 +70,7 @@ def main():
         theta = random.uniform(0, 1)
         population_size = 500
         mutpb = theta * 0.099 + 0.001
-        mutpb = round(theta, 5)
+        mutpb = round(mutpb, 5)
         cxpb = 0.6       
         evaluations_per_theta = []
 

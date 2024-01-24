@@ -35,7 +35,7 @@ def main():
         # population_size = (int)(theta * 998) + 2  # 各ループごとにランダムに生成された値
         population_size = 500 # ???←最適化された値に設定
         mutpb = theta * 0.099 + 0.001
-        mutpb = round(theta, 5)
+        mutpb = round(mutpb, 5)
         evaluations_per_theta = []
         cxpb = 0.6
 
