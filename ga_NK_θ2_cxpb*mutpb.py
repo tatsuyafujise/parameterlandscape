@@ -60,9 +60,10 @@ toolbox.register("mutate", tools.mutFlipBit, indpb=0.05)  # ビット反転突�
 toolbox.register("select", tools.selTournament, tournsize=3)
 
 def main():
-    random.seed(42)
+    random.seed(45)
     generations = 1000 # 世代数
-    csv_filename = "ga_results_NK_populationsize*cxpb.csv"
+    population_size = 500
+    csv_filename = "ga_results_NK_cxpb*mutpb.csv"
     data = []
     heatdict = {}
     for key in range(60):
@@ -72,9 +73,10 @@ def main():
     for _ in range(1000):
         theta = random.uniform(0, 1)
         theta2 = random.uniform(0, 1)
-        population_size = (int)(theta * 998) + 2
-        cxpb = theta2 * 6 / 10 + 0.3
+        cxpb = theta * 6 / 10 + 0.3
         cxpb = round(cxpb, 3)
+        mutpb = theta2 * 0.099 +0.001
+        mutpb = round(mutpb, 5) # 交叉率を2つ目のパラメータに設定
         evaluations_per_theta = []
 
         for _ in range(10):
@@ -86,9 +88,7 @@ def main():
             optimum_found_at_generation = None # 最適解が見つかった世代を追跡するための変数
 
             if cxpb > 0.9:
-                mutpb = 1.00 - cxpb
-            else:
-                mutpb = 0.01            
+                cxpb = 1.00 - mutpb
 
             for gen in range(generations):
                 algorithms.eaMuPlusLambda(population, toolbox, mu=population_size, lambda_=population_size, cxpb=cxpb, mutpb=mutpb, ngen=1, stats=None, halloffame=None, verbose=False)
@@ -118,8 +118,8 @@ def main():
 
         # average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
         average_evaluations = np.median(evaluations_per_theta)
-        heatdict.setdefault(((int)((population_size-1)/100)+10*(int)(10*(cxpb-0.31))), []).append(average_evaluations)
-        data.append([int(population_size), float(cxpb), int(average_evaluations)])
+        heatdict.setdefault((10*(int)(10*(cxpb-0.31))+(int)(100*(mutpb-0.0011))), []).append(average_evaluations)
+        data.append([float(cxpb), float(mutpb), int(average_evaluations)])
 
     np.set_printoptions(suppress = True, precision = 2)
     data_np = np.array(data)
@@ -140,7 +140,7 @@ def main():
     data_best_θ2 = np.array(data_sorted[0][1])
 
     # FDCの計算
-    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1) / 998, (data_sorted[i][1] - data_best_θ2) * 10 / 6], ord=2) for i in range(1000)]
+    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1) * 10 / 6, (data_sorted[i][1] - data_best_θ2) / 0.099], ord=2) for i in range(1000)]
     print(dist)
     evaluations = [data_sorted[i][2] for i in range(1000)]
 
@@ -159,20 +159,19 @@ def main():
     ax1.scatter(dist, evaluations)
     ax1.set_xlabel('distance')
     ax1.set_ylabel('evaluations')
-    ax1.set_title('NK_fdc_population size vs cxpb')
+    ax1.set_title('NK_fdc_cxpb vs mutpb')
     ax1.grid(True)
 
     ax2 = Fig.add_subplot(2,1,2)    # ヒートマップ
-    X = np.arange(0, 1000)
-    Y = np.arange(3, 10)/10
+    X = np.arange(3, 10)/10
+    Y = np.arange(1, 100)/1000
     mappable = ax2.pcolor(zz, edgecolors='k', linewidths=2, cmap='nipy_spectral_r')  # edgecolors, linewidths, cmap を追加
-    plt.colorbar(mappable, ax=ax2)
-    # x = heatdict.keys % 10
+    plt.colorbar(mappable, ax=ax2)    # x = heatdict.keys % 10
     # y = heatdict.keys / 10
     # ax2.pcolor(X,Y,zz)
 
     # ラベルやタイトルの設定
-    ax2.set_xlabel('Population Size')
+    ax2.set_xlabel('Mutation Probability')
     ax2.set_ylabel('Crossover Probability')
     ax2.set_title('NK_Heatmap')
 
