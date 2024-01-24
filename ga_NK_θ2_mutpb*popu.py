@@ -77,6 +77,7 @@ def main():
         mutpb = theta2 * 0.099 +0.001
         mutpb = round(mutpb, 5) # 交叉率を2つ目のパラメータに設定
         evaluations_per_theta = []
+        cxpb = 0.6
 
         for _ in range(10):
 
