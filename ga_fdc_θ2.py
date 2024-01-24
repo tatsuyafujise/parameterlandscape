@@ -38,7 +38,7 @@ def main():
         theta2 = random.uniform(0, 1)
         population_size = (int)(theta * 998) + 2  # 各ループごとにランダムに生成された値
         cxpb = theta2 * 6 / 10 + 0.3
-        cxpb = round(cxpb, 2) # 交叉率を2つ目のパラメータに設定
+        cxpb = round(cxpb, 3) # 交叉率を2つ目のパラメータに設定
         evaluations_per_theta = []
 
         for _ in range(10):

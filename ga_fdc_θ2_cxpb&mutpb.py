@@ -37,7 +37,7 @@ def main():
         theta = random.uniform(0, 1)  # パラメータθをランダムに生成
         theta2 = random.uniform(0, 1)
         cxpb = theta * 6 / 10 + 0.3
-        cxpb = round(cxpb, 2)
+        cxpb = round(cxpb, 3)
         mutpb = theta2 * 0.099 +0.001
         mutpb = round(mutpb, 5) # 交叉率を2つ目のパラメータに設定
         evaluations_per_theta = []

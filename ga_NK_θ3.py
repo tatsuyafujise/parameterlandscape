@@ -7,10 +7,10 @@ from deap import base, creator, tools, algorithms
 
 
 # NKランドスケープの要素数とKを設定
-N = 15  # 要素数
+N = 12  # 要素数
 K = 2   # 各要素の相互作用数
 
-random.seed(25) # NK参照表のスコアのための乱数
+random.seed(30) # NK参照表のスコアのための乱数
 
 window_size = K + 1
 bit_list = ['{:b}'.format(i).zfill(window_size) for i in range(2**window_size)]
@@ -60,17 +60,21 @@ toolbox.register("mutate", tools.mutFlipBit, indpb=0.05)  # ビット反転突�
 toolbox.register("select", tools.selTournament, tournsize=3)
 
 def main():
-    random.seed(42)
+    random.seed(51)
     generations = 1000 # 世代数
-    csv_filename = "ga_results_NK_cxpb.csv"
+    csv_filename = "ga_results_NK_populationsize*cxpb*mutpb.csv"
     data = []
     n = 1
 
     for _ in range(1000):
         theta = random.uniform(0, 1)
-        population_size = 500
-        cxpb = theta * 6 /10 + 0.3
-        cxpb = round(cxpb, 3)        
+        theta2 = random.uniform(0, 1) # cxpb
+        theta3 = random.uniform(0, 1) # mutpb
+        population_size = (int)(theta * 998) + 2
+        cxpb = theta2 * 0.6 + 0.3
+        cxpb = round(cxpb, 3)
+        mutpb = theta3 * 0.099 + 0.001
+        mutpb = round(mutpb, 5)
         evaluations_per_theta = []
 
         for _ in range(10):
@@ -80,10 +84,10 @@ def main():
 
             # 遺伝的アルゴリズムの実行
             optimum_found_at_generation = None # 最適解が見つかった世代を追跡するための変数
-            if cxpb > 0.9:
+            if cxpb + mutpb >1.0:
                 mutpb = 1.00 - cxpb
-            else:
-                mutpb = 0.01   
+
+
             for gen in range(generations):
                 algorithms.eaMuPlusLambda(population, toolbox, mu=population_size, lambda_=population_size, cxpb=cxpb, mutpb=mutpb, ngen=1, stats=None, halloffame=None, verbose=False)
 
@@ -112,11 +116,11 @@ def main():
 
         # average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
         average_evaluations = np.median(evaluations_per_theta)
-        data.append([cxpb, average_evaluations])
+        data.append([int(population_size), float(cxpb), float(mutpb), int(average_evaluations)])
 
     np.set_printoptions(suppress = True, precision = 2)
     data_np = np.array(data)
-    data_sorted = data_np[np.argsort(data_np[:,1])]
+    data_sorted = data_np[np.argsort(data_np[:,3])]
     print(data_sorted)
 
     with open(csv_filename, 'w', newline = '') as csv_file:
@@ -124,12 +128,13 @@ def main():
         csv_writer.writerows(data_sorted)
 
     # 最適解
-    data_best = np.array(data_sorted[0][0])
-
+    data_best_θ1 = np.array(data_sorted[0][0])
+    data_best_θ2 = np.array(data_sorted[0][1])
+    data_best_θ3 = np.array(data_sorted[0][2])
     # FDCの計算
-    dist = [abs(data_sorted[i][0] - data_best) * 10 / 6 for i in range(1000)]
+    dist = [np.linalg.norm([(data_sorted[i][0] - data_best_θ1) / 998, (data_sorted[i][1] - data_best_θ2) / 0.6, (data_sorted[i][2] - data_best_θ3) / 0.099], ord=2) for i in range(1000)]
     print(dist)
-    evaluations = [data_sorted[i][1] for i in range(1000)]
+    evaluations = [data_sorted[i][3] for i in range(1000)]
 
     # VCの計算
     mean_evaluations = np.mean(evaluations)
@@ -145,7 +150,7 @@ def main():
     plt.scatter(dist, evaluations)     
     plt.xlabel('distance')
     plt.ylabel('evaluations')
-    plt.title('fdc_cxpb')
+    plt.title('fdc_population size vs cxpb vs mutpb')
     plt.grid(True)
     plt.show() 
 
