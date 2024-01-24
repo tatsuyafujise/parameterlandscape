@@ -33,7 +33,7 @@ def main():
     for _ in range(1000):  # 1000回ループ
         theta = random.uniform(0, 1)  # パラメータθをランダムに生成
         # population_size = (int)(theta * 998) + 2  # 各ループごとにランダムに生成された値
-        population_size = 500 #???←最適化された値に設定
+        population_size = 180 #???←最適化された値に設定
         cxpb = theta * 6 /10 + 0.3
         cxpb = round(cxpb, 3)
         evaluations_per_theta = []

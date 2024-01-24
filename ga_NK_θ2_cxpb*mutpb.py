@@ -62,7 +62,7 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 def main():
     random.seed(45)
     generations = 1000 # 世代数
-    population_size = 500
+    population_size = 180
     csv_filename = "ga_results_NK_cxpb*mutpb.csv"
     data = []
     heatdict = {}

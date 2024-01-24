@@ -25,7 +25,7 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 def main():
     random.seed(60)  # 乱数シードを設定
     generations = 10000  # 世代数
-    population_size = 500
+    population_size = 180
     csv_filename = "ga_results_onemax_cxpb*mutpb.csv"
     data = [] # データを格納するリスト
     heatdict = {}

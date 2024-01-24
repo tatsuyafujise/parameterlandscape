@@ -68,7 +68,7 @@ def main():
 
     for _ in range(1000):
         theta = random.uniform(0, 1)
-        population_size = 500
+        population_size = 180
         cxpb = theta * 6 /10 + 0.3
         cxpb = round(cxpb, 3)        
         evaluations_per_theta = []

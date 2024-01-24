@@ -68,7 +68,7 @@ def main():
 
     for _ in range(1000):
         theta = random.uniform(0, 1)
-        population_size = 500
+        population_size = 180
         mutpb = theta * 0.099 + 0.001
         mutpb = round(mutpb, 5)
         cxpb = 0.6       
