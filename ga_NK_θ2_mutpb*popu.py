@@ -119,7 +119,7 @@ def main():
         # average_evaluations = sum(evaluations_per_theta) / len(evaluations_per_theta)
         average_evaluations = np.median(evaluations_per_theta)
         heatdict.setdefault(((int)((population_size-1)/100)+10*(int)(100*(mutpb-0.0011))), []).append(average_evaluations)
-        data.append([float(cxpb), float(mutpb), int(average_evaluations)])
+        data.append([float(population_size), float(mutpb), int(average_evaluations)])
 
     np.set_printoptions(suppress = True, precision = 2)
     data_np = np.array(data)
