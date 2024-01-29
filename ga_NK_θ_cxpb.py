@@ -125,7 +125,7 @@ def main():
 
     # 最適解
     data_best = np.array(data_sorted[0][0])
-    diff = max((data_sorted[0][0]-0.3),(0.9-data_sorted[0][0])
+    diff = max((data_sorted[0][0]-0.3),(0.9-data_sorted[0][0]))
 
     # FDCの計算
     dist = [abs(data_sorted[i][0] - data_best) / diff for i in range(1000)]
